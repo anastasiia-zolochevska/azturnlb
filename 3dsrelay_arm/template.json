@@ -1,0 +1,311 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "location": {
+            "type": "string"
+        },
+        "instanceCount":
+        {
+            "type": "int"
+        },
+        "virtualMachineNamePrefix": {
+            "type": "string"
+        },
+        "virtualMachineSize": {
+            "type": "string"
+        },
+        "adminUsername": {
+            "type": "string",
+            "defaultValue": "turnroot"
+        },
+        "adminPublicKey": {
+            "type": "string"
+        },
+        "availabilitySetPlatformFaultDomainCount": {
+            "type": "string",
+            "defaultValue": "3"
+        },
+        "availabilitySetPlatformUpdateDomainCount": {
+            "type": "string",
+            "defaultValue": "5"
+        },
+        "diagnosticsStorageAccountName": {
+            "type": "string"
+        },
+        "addressPrefix": {
+            "type": "string",
+            "defaultValue": "10.7.0.0/16"
+        },
+        "subnetName": {
+            "type": "string",
+            "defaultValue": "default"
+        },
+        "subnetPrefix": {
+            "type": "string",
+            "defaultValue": "10.7.1.0/24"
+        },
+        "publicIpAddressType": {
+            "type": "string",
+            "defaultValue": "Static"
+        },
+        "postgreSqlConnectionString": {
+            "type": "securestring"
+        },
+        "defaultTurnRealm" : {
+            "type": "string"
+        },
+        "turnImage": {
+            "type": "string"
+        }
+    },
+    "variables": {
+        "vmName": "[concat(parameters('virtualMachineNamePrefix'),uniqueString(resourceGroup().id))]",
+        "networkInterfaceName": "[concat(variables('vmName'),'-net')]",
+        "publicIpAddressName": "[concat(variables('vmName'),'-ip')]",
+        "virtualNetworkName": "[concat(variables('vmName'), '-vnet')]",
+        "vnetId": "[resourceId(resourceGroup().name,'Microsoft.Network/virtualNetworks', variables('virtualNetworkName'))]",
+        "subnetRef": "[concat(variables('vnetId'), '/subnets/', parameters('subnetName'))]",
+        "networkSecurityGroupName": "[concat(variables('vmName'),'-nsg')]",
+        "availabilitySetName": "[concat(variables('vmName'),'-as')]"
+    },
+    "resources": [
+        {
+            "name": "[concat(variables('vmName'),copyIndex())]",
+            "type": "Microsoft.Compute/virtualMachines",
+            "apiVersion": "2016-04-30-preview",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "networkinterfacecopy",
+                "[concat('Microsoft.Compute/availabilitySets/', variables('availabilitySetName'))]"
+            ],
+            "copy": {
+                "name": "vmcopy",
+                "count": "[parameters('instanceCount')]"
+            },
+            "properties": {
+                "osProfile": {
+                    "computerName": "[concat(variables('vmName'),copyIndex())]",
+                    "adminUsername": "[parameters('adminUsername')]",
+                    "linuxConfiguration": {
+                        "disablePasswordAuthentication": "true",
+                        "ssh": {
+                            "publicKeys": [
+                                {
+                                    "path": "[concat('/home/', parameters('adminUsername'), '/.ssh/authorized_keys')]",
+                                    "keyData": "[parameters('adminPublicKey')]"
+                                }
+                            ]
+                        }
+                    }
+                },
+                "hardwareProfile": {
+                    "vmSize": "[parameters('virtualMachineSize')]"
+                },
+                "storageProfile": {
+                    "imageReference": {
+                        "publisher": "Canonical",
+                        "offer": "UbuntuServer",
+                        "sku": "16.04-LTS",
+                        "version": "latest"
+                    },
+                    "osDisk": {
+                        "createOption": "fromImage",
+                        "managedDisk": {
+                            "storageAccountType": "Standard_LRS"
+                        }
+                    },
+                    "dataDisks": []
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', concat(variables('networkInterfaceName'),copyIndex()))]"
+                        }
+                    ]
+                },
+                "diagnosticsProfile": {
+                    "bootDiagnostics": {
+                        "enabled": true,
+                        "storageUri": "[reference(resourceId('anprice-ws2k16-rg', 'Microsoft.Storage/storageAccounts', parameters('diagnosticsStorageAccountName')), '2015-06-15').primaryEndpoints['blob']]"
+                    }
+                },
+                "availabilitySet": {
+                    "id": "[resourceId('Microsoft.Compute/availabilitySets', variables('availabilitySetName'))]"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Compute/virtualMachines/extensions",
+            "name": "[concat(variables('vmName'),copyIndex(),'/DockerExtension')]",
+            "apiVersion": "2015-05-01-preview",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "vmcopy"
+            ],
+            "copy": {
+                "name": "dockerextcopy",
+                "count": "[parameters('instanceCount')]"
+            },
+            "properties": {
+                "publisher": "Microsoft.Azure.Extensions",
+                "type": "DockerExtension",
+                "typeHandlerVersion": "1.1",
+                "autoUpgradeMinorVersion": true,
+                "settings": {
+                    "docker": {
+                        "port": "2376"
+                    }
+                }
+            }
+        },
+        {
+            "name": "[concat(variables('vmName'),copyIndex(),'/CustomScriptExtension')]",
+            "type": "Microsoft.Compute/virtualMachines/extensions",
+            "location": "[resourceGroup().location]",
+            "apiVersion": "2015-06-15",
+            "dependsOn": [
+                "dockerextcopy"
+            ],
+            "tags": {
+                "displayName": "docker-stuff"
+            },
+            "copy": {
+                "name": "custscriptextcopy",
+                "count": "[parameters('instanceCount')]"
+            },
+            "properties": {
+                "publisher": "Microsoft.Azure.Extensions",
+                "type": "CustomScript",
+                "typeHandlerVersion": "2.0",
+                "autoUpgradeMinorVersion": true,
+                "settings": {
+                },
+                "protectedSettings": {
+                    "commandToExecute": "[concat('docker run -d -p 3478:3478 -p 3478:3478/udp --restart=always ', parameters('turnImage'), ' ''',parameters('postgreSqlConnectionString'),''' ', parameters('defaultTurnRealm'))]"
+                }
+            }
+        },
+        {
+            "name": "[variables('availabilitySetName')]",
+            "type": "Microsoft.Compute/availabilitySets",
+            "apiVersion": "2016-04-30-preview",
+            "location": "[parameters('location')]",
+            "properties": {
+                "platformFaultDomainCount": "[parameters('availabilitySetPlatformFaultDomainCount')]",
+                "platformUpdateDomainCount": "[parameters('availabilitySetPlatformUpdateDomainCount')]",
+                "managed": true
+            }
+        },
+        {
+            "name": "[variables('virtualNetworkName')]",
+            "type": "Microsoft.Network/virtualNetworks",
+            "apiVersion": "2016-12-01",
+            "location": "[parameters('location')]",
+            "properties": {
+                "addressSpace": {
+                    "addressPrefixes": [
+                        "[parameters('addressPrefix')]"
+                    ]
+                },
+                "subnets": [
+                    {
+                        "name": "[parameters('subnetName')]",
+                        "properties": {
+                            "addressPrefix": "[parameters('subnetPrefix')]"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "name": "[concat(variables('networkInterfaceName'),copyIndex())]",
+            "type": "Microsoft.Network/networkInterfaces",
+            "apiVersion": "2016-09-01",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[concat('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]",
+                "publicipcopy",
+                "[concat('Microsoft.Network/networkSecurityGroups/', variables('networkSecurityGroupName'))]"
+            ],
+            "copy": {
+                "name": "networkinterfacecopy",
+                "count": "[parameters('instanceCount')]"
+            },
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig1",
+                        "properties": {
+                            "subnet": {
+                                "id": "[variables('subnetRef')]"
+                            },
+                            "privateIPAllocationMethod": "Dynamic",
+                            "publicIpAddress": {
+                                "id": "[resourceId(resourceGroup().name,'Microsoft.Network/publicIpAddresses', concat(variables('publicIpAddressName'),copyIndex()))]"
+                            }
+                        }
+                    }
+                ],
+                "networkSecurityGroup": {
+                    "id": "[resourceId(resourceGroup().name, 'Microsoft.Network/networkSecurityGroups', variables('networkSecurityGroupName'))]"
+                }
+            }
+        },
+        {
+            "name": "[concat(variables('publicIpAddressName'),copyIndex())]",
+            "type": "Microsoft.Network/publicIpAddresses",
+            "apiVersion": "2016-09-01",
+            "location": "[parameters('location')]",
+            "copy": {
+                "name": "publicipcopy",
+                "count": "[parameters('instanceCount')]"
+            },
+            "properties": {
+                "publicIpAllocationMethod": "[parameters('publicIpAddressType')]"
+            }
+        },
+        {
+            "name": "[variables('networkSecurityGroupName')]",
+            "type": "Microsoft.Network/networkSecurityGroups",
+            "apiVersion": "2016-09-01",
+            "location": "[parameters('location')]",
+            "properties": {
+                "securityRules": [
+                    {
+                        "name": "allow-3478",
+                        "properties": {
+                            "priority": 300,
+                            "sourceAddressPrefix": "*",
+                            "protocol": "*",
+                            "destinationPortRange": "3478",
+                            "access": "Allow",
+                            "direction": "Inbound",
+                            "sourcePortRange": "*",
+                            "destinationAddressPrefix": "*"
+                        }
+                    },
+                    {
+                        "name": "default-allow-ssh",
+                        "properties": {
+                            "priority": 1000,
+                            "sourceAddressPrefix": "*",
+                            "protocol": "TCP",
+                            "destinationPortRange": "22",
+                            "access": "Allow",
+                            "direction": "Inbound",
+                            "sourcePortRange": "*",
+                            "destinationAddressPrefix": "*"
+                        }
+                    }
+                ]
+            }
+        }
+    ],
+    "outputs": {
+        "adminUsername": {
+            "type": "string",
+            "value": "[parameters('adminUsername')]"
+        }
+    }
+}

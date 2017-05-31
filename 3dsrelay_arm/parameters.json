@@ -1,0 +1,33 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "location": {
+            "value": "centralus"
+        },
+        "instanceCount": {
+            "value": 3
+        },
+        "virtualMachineNamePrefix": {
+            "value": "azturntst"
+        },
+        "virtualMachineSize": {
+            "value": "Standard_A2"
+        },
+        "adminPublicKey": {
+            "value": null
+        },
+        "diagnosticsStorageAccountName": {
+            "value": null
+        },
+        "postgreSqlConnectionString": {
+            "value": "host=something.postgres.database.azure.com dbname=coturndb user=coturn@something password=ADecentPassword? connect_timeout=30 sslmode=require port=543"
+        },
+        "defaultTurnRealm": {
+            "value": "azturntst.org"
+        },
+        "turnImage": {
+            "value": null
+        }
+    }
+}
