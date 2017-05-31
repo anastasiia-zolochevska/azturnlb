@@ -1,0 +1,36 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "administratorLogin": {
+            "value": null
+        },
+        "administratorLoginPassword": {
+            "value": null
+        },
+        "serverName": {
+            "value": null
+        },
+        "location": {
+            "value": "southcentralus"
+        },
+        "skuName": {
+            "value": "PGSQLB100"
+        },
+        "skuTier": {
+            "value": "Basic"
+        },
+        "skuCapacityDTU": {
+            "value": 100
+        },
+        "skuFamily": {
+            "value": "SkuFamily"
+        },
+        "skuSizeMB": {
+            "value": 51200
+        },
+        "version": {
+            "value": "9.6"
+        }
+    }
+}
