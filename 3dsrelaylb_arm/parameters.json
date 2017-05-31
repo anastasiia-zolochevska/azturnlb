@@ -1,0 +1,24 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "vmSku": {
+            "value": "Standard_A1"
+        },
+        "vmssName": {
+            "value": "azturntstrly"
+        },
+        "instanceCount": {
+            "value": 1
+        },
+        "adminPublicKey": {
+            "value": null
+        },
+        "relayIPs": {
+            "value": "24.55.76.33:3478 23.33.240.44:3478 36.34.243.55:3478"
+        },
+        "relayImage": {
+            "value": "obsoleted/3dsrelaylb:v0.0.2a"
+        }
+    }
+}
