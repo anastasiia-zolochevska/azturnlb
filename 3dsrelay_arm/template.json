@@ -57,7 +57,36 @@
         },
         "turnImage": {
             "type": "string"
-        }
+        },
+         "vaultName": {
+            "type": "String",
+            "defaultValue": "keyvault-3dtoolkit"
+            "metadata": {
+                "description": "Name of Key Vault that contains certificate for TURN server"
+            }
+        },
+        "vaultResourceGroup": {
+            "type": "String",
+            "defaultValue": "keyvault-3dtoolkit"
+            "metadata": {
+                "description": "Resource Group of Key Vault that has a secret"
+            }
+        },
+        "secretUrlWithVersion": {
+            "type": "String",
+            "defaultValue": "https://keyvault-3dtoolkit.vault.azure.net/secrets/turn-cert/d08e7e3d2cc84c7fa16022451d605237"
+            "metadata": {
+                "description": "Url of the certificate in Key Vault"
+            }
+        },
+        "certThumbprint": {
+            "type": "String",
+            "defaultValue": "18E1F24AAF85A6804ACC89FAC5DB9DFEFD30C034"
+            "metadata": {
+                "description": "Thumbprint of the certificate"
+            }
+        },
+
     },
     "variables": {
         "vmName": "[concat(parameters('virtualMachineNamePrefix'),uniqueString(resourceGroup().id))]",
@@ -300,6 +329,27 @@
                     }
                 ]
             }
+        },
+        {
+          "type": "Microsoft.Compute/virtualMachines/extensions",
+          "name": "[concat(variables('machineName'), '/', variables('machineName'), '-scripts')]",
+          "apiVersion": "2016-03-30",
+          "location": "[variables('location')]",
+          "properties": {
+            "publisher": "Microsoft.Azure.Extensions",
+            "type": "CustomScript",
+            "typeHandlerVersion": "2.0",
+            "autoUpgradeMinorVersion": true,
+            "settings": {
+              "fileUris": [
+                "https://raw.githubusercontent.com/anastasiia-zolochevska/azturnlb/master/3dsrelay_arm/moveCert.sh"
+              ],
+              "commandToExecute": "bash moveCert.sh [parameters('certThumbprint')]"
+            }
+          },
+          "dependsOn": [
+            "[resourceId('Microsoft.Compute/virtualMachines', variables('machineName'))]"
+          ]
         }
     ],
     "outputs": {
