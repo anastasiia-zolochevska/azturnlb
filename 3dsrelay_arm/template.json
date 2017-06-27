@@ -328,6 +328,19 @@
                         }
                     },
                     {
+                        "name": "allow-5349",
+                        "properties": {
+                            "priority": 400,
+                            "sourceAddressPrefix": "*",
+                            "protocol": "*",
+                            "destinationPortRange": "5349",
+                            "access": "Allow",
+                            "direction": "Inbound",
+                            "sourcePortRange": "*",
+                            "destinationAddressPrefix": "*"
+                        }
+                    },
+                    {
                         "name": "default-allow-ssh",
                         "properties": {
                             "priority": 1000,
