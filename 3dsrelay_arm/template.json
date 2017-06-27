@@ -3,85 +3,86 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "location": {
-            "type": "string"
+            "type": "String"
         },
-        "instanceCount":
-        {
-            "type": "int"
+        "instanceCount": {
+            "type": "Int"
         },
         "virtualMachineNamePrefix": {
-            "type": "string"
+            "type": "String"
         },
         "virtualMachineSize": {
-            "type": "string"
+            "defaultValue": "Standard_A2",
+            "type": "String"
         },
         "adminUsername": {
-            "type": "string",
-            "defaultValue": "turnroot"
+            "defaultValue": "turnroot",
+            "type": "String"
         },
         "adminPublicKey": {
-            "type": "string"
+            "type": "String"
         },
         "availabilitySetPlatformFaultDomainCount": {
-            "type": "string",
-            "defaultValue": "3"
+            "defaultValue": "3",
+            "type": "String"
         },
         "availabilitySetPlatformUpdateDomainCount": {
-            "type": "string",
-            "defaultValue": "5"
+            "defaultValue": "5",
+            "type": "String"
         },
-        "diagnosticsStorageAccountName": {
-            "type": "string"
+        "diagnosticsStorageUrl": {
+            "defaultValue": "https://3dstreamingdiagnostics.blob.core.windows.net/",
+            "type": "String"
         },
         "addressPrefix": {
-            "type": "string",
-            "defaultValue": "10.7.0.0/16"
+            "defaultValue": "10.7.0.0/16",
+            "type": "String"
         },
         "subnetName": {
-            "type": "string",
-            "defaultValue": "default"
+            "defaultValue": "default",
+            "type": "String"
         },
         "subnetPrefix": {
-            "type": "string",
-            "defaultValue": "10.7.1.0/24"
+            "defaultValue": "10.7.1.0/24",
+            "type": "String"
         },
         "publicIpAddressType": {
-            "type": "string",
-            "defaultValue": "Static"
+            "defaultValue": "Static",
+            "type": "String"
         },
         "postgreSqlConnectionString": {
-            "type": "securestring"
+            "type": "SecureString"
         },
-        "defaultTurnRealm" : {
-            "type": "string"
+        "defaultTurnRealm": {
+            "type": "String"
         },
         "turnImage": {
-            "type": "string"
+            "type": "String"
         },
-         "vaultName": {
+        "vaultName": {
+            "defaultValue": "keyvault3dstreaming",
             "type": "String",
-            "defaultValue": "keyvault-3dtoolkit",
             "metadata": {
                 "description": "Name of Key Vault that contains certificate for TURN server"
             }
         },
         "vaultResourceGroup": {
+            "defaultValue": "keyvault3dstreaming",
             "type": "String",
-            "defaultValue": "keyvault-3dtoolkit",
             "metadata": {
                 "description": "Resource Group of Key Vault that has a secret"
             }
         },
         "secretUrlWithVersion": {
+            "defaultValue": "https://keyvault3dstreaming.vault.azure.net/secrets/turnCert/2d973062709843b2ba820cc3cece86c8",
             "type": "String",
-            "defaultValue": "https://keyvault-3dtoolkit.vault.azure.net/secrets/turn-cert/d08e7e3d2cc84c7fa16022451d605237",
             "metadata": {
                 "description": "Url of the certificate in Key Vault"
             }
         },
         "certThumbprint": {
-            "type": "String",
             "defaultValue": "18E1F24AAF85A6804ACC89FAC5DB9DFEFD30C034",
+            "type": "String",
             "metadata": {
                 "description": "Thumbprint of the certificate"
             }
@@ -99,14 +100,10 @@
     },
     "resources": [
         {
-            "name": "[concat(variables('vmName'),copyIndex())]",
             "type": "Microsoft.Compute/virtualMachines",
+            "name": "[concat(variables('vmName'),copyIndex())]",
             "apiVersion": "2016-04-30-preview",
             "location": "[parameters('location')]",
-            "dependsOn": [
-                "networkinterfacecopy",
-                "[concat('Microsoft.Compute/availabilitySets/', variables('availabilitySetName'))]"
-            ],
             "copy": {
                 "name": "vmcopy",
                 "count": "[parameters('instanceCount')]"
@@ -125,7 +122,19 @@
                                 }
                             ]
                         }
-                    }
+                    },
+                    "secrets": [
+                        {
+                            "sourceVault": {
+                                "id": "[resourceId(parameters('vaultResourceGroup'), 'Microsoft.KeyVault/vaults', parameters('vaultName'))]"
+                            },
+                            "vaultCertificates": [
+                                {
+                                    "certificateUrl": "[parameters('secretUrlWithVersion')]"
+                                }
+                            ]
+                        }
+                    ]
                 },
                 "hardwareProfile": {
                     "vmSize": "[parameters('virtualMachineSize')]"
@@ -155,22 +164,23 @@
                 "diagnosticsProfile": {
                     "bootDiagnostics": {
                         "enabled": true,
-                        "storageUri": "[reference(resourceId('anprice-ws2k16-rg', 'Microsoft.Storage/storageAccounts', parameters('diagnosticsStorageAccountName')), '2015-06-15').primaryEndpoints['blob']]"
+                        "storageUri": "[parameters('diagnosticsStorageUrl')]"
                     }
                 },
                 "availabilitySet": {
                     "id": "[resourceId('Microsoft.Compute/availabilitySets', variables('availabilitySetName'))]"
                 }
-            }
+            },
+            "dependsOn": [
+                "networkinterfacecopy",
+                "[concat('Microsoft.Compute/availabilitySets/', variables('availabilitySetName'))]"
+            ]
         },
         {
             "type": "Microsoft.Compute/virtualMachines/extensions",
             "name": "[concat(variables('vmName'),copyIndex(),'/DockerExtension')]",
             "apiVersion": "2015-05-01-preview",
             "location": "[resourceGroup().location]",
-            "dependsOn": [
-                "vmcopy"
-            ],
             "copy": {
                 "name": "dockerextcopy",
                 "count": "[parameters('instanceCount')]"
@@ -185,22 +195,22 @@
                         "port": "2376"
                     }
                 }
-            }
+            },
+            "dependsOn": [
+                "vmcopy"
+            ]
         },
         {
-            "name": "[concat(variables('vmName'),copyIndex(),'/CustomScriptExtension')]",
             "type": "Microsoft.Compute/virtualMachines/extensions",
-            "location": "[resourceGroup().location]",
+            "name": "[concat(variables('vmName'),copyIndex(),'/CustomScriptExtension')]",
             "apiVersion": "2015-06-15",
-            "dependsOn": [
-                "dockerextcopy"
-            ],
-            "tags": {
-                "displayName": "docker-stuff"
-            },
+            "location": "[resourceGroup().location]",
             "copy": {
                 "name": "custscriptextcopy",
                 "count": "[parameters('instanceCount')]"
+            },
+            "tags": {
+                "displayName": "docker-stuff"
             },
             "properties": {
                 "publisher": "Microsoft.Azure.Extensions",
@@ -208,17 +218,21 @@
                 "typeHandlerVersion": "2.0",
                 "autoUpgradeMinorVersion": true,
                 "settings": {
-                },
-                "protectedSettings": {
-                    "commandToExecute": "[concat('docker run -d -p 3478:3478 -p 3478:3478/udp --restart=always ', parameters('turnImage'), ' ''',parameters('postgreSqlConnectionString'),''' ', parameters('defaultTurnRealm'))]"
+                    "fileUris": [
+                        "https://raw.githubusercontent.com/anastasiia-zolochevska/azturnlb/master/3dsrelay_arm/startDocker.sh"
+                    ],
+                    "commandToExecute": "[concat('bash startDocker.sh ', parameters('certThumbprint'),' ', parameters('turnImage'), ' ',parameters('postgreSqlConnectionString'),' ', parameters('defaultTurnRealm'))]"
                 }
-            }
+            },
+            "dependsOn": [
+                "dockerextcopy"
+            ]
         },
         {
-            "name": "[variables('availabilitySetName')]",
             "type": "Microsoft.Compute/availabilitySets",
+            "name": "[variables('availabilitySetName')]",
             "apiVersion": "2016-04-30-preview",
-            "location": "[parameters('location')]",
+            "location": "[resourceGroup().location]",
             "properties": {
                 "platformFaultDomainCount": "[parameters('availabilitySetPlatformFaultDomainCount')]",
                 "platformUpdateDomainCount": "[parameters('availabilitySetPlatformUpdateDomainCount')]",
@@ -226,8 +240,8 @@
             }
         },
         {
-            "name": "[variables('virtualNetworkName')]",
             "type": "Microsoft.Network/virtualNetworks",
+            "name": "[variables('virtualNetworkName')]",
             "apiVersion": "2016-12-01",
             "location": "[parameters('location')]",
             "properties": {
@@ -247,15 +261,10 @@
             }
         },
         {
-            "name": "[concat(variables('networkInterfaceName'),copyIndex())]",
             "type": "Microsoft.Network/networkInterfaces",
+            "name": "[concat(variables('networkInterfaceName'),copyIndex())]",
             "apiVersion": "2016-09-01",
             "location": "[parameters('location')]",
-            "dependsOn": [
-                "[concat('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]",
-                "publicipcopy",
-                "[concat('Microsoft.Network/networkSecurityGroups/', variables('networkSecurityGroupName'))]"
-            ],
             "copy": {
                 "name": "networkinterfacecopy",
                 "count": "[parameters('instanceCount')]"
@@ -278,11 +287,16 @@
                 "networkSecurityGroup": {
                     "id": "[resourceId(resourceGroup().name, 'Microsoft.Network/networkSecurityGroups', variables('networkSecurityGroupName'))]"
                 }
-            }
+            },
+            "dependsOn": [
+                "[concat('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]",
+                "publicipcopy",
+                "[concat('Microsoft.Network/networkSecurityGroups/', variables('networkSecurityGroupName'))]"
+            ]
         },
         {
-            "name": "[concat(variables('publicIpAddressName'),copyIndex())]",
             "type": "Microsoft.Network/publicIpAddresses",
+            "name": "[concat(variables('publicIpAddressName'),copyIndex())]",
             "apiVersion": "2016-09-01",
             "location": "[parameters('location')]",
             "copy": {
@@ -294,8 +308,8 @@
             }
         },
         {
-            "name": "[variables('networkSecurityGroupName')]",
             "type": "Microsoft.Network/networkSecurityGroups",
+            "name": "[variables('networkSecurityGroupName')]",
             "apiVersion": "2016-09-01",
             "location": "[parameters('location')]",
             "properties": {
@@ -328,32 +342,11 @@
                     }
                 ]
             }
-        },
-        {
-          "type": "Microsoft.Compute/virtualMachines/extensions",
-          "name": "[concat(variables('machineName'), '/', variables('machineName'), '-scripts')]",
-          "apiVersion": "2016-03-30",
-          "location": "[variables('location')]",
-          "properties": {
-            "publisher": "Microsoft.Azure.Extensions",
-            "type": "CustomScript",
-            "typeHandlerVersion": "2.0",
-            "autoUpgradeMinorVersion": true,
-            "settings": {
-              "fileUris": [
-                "https://raw.githubusercontent.com/anastasiia-zolochevska/azturnlb/master/3dsrelay_arm/moveCert.sh"
-              ],
-              "commandToExecute": "bash moveCert.sh [parameters('certThumbprint')]"
-            }
-          },
-          "dependsOn": [
-            "[resourceId('Microsoft.Compute/virtualMachines', variables('machineName'))]"
-          ]
         }
     ],
     "outputs": {
         "adminUsername": {
-            "type": "string",
+            "type": "String",
             "value": "[parameters('adminUsername')]"
         }
     }
