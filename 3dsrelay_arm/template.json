@@ -315,19 +315,6 @@
             "properties": {
                 "securityRules": [
                     {
-                        "name": "allow-3478",
-                        "properties": {
-                            "priority": 300,
-                            "sourceAddressPrefix": "*",
-                            "protocol": "*",
-                            "destinationPortRange": "3478",
-                            "access": "Allow",
-                            "direction": "Inbound",
-                            "sourcePortRange": "*",
-                            "destinationAddressPrefix": "*"
-                        }
-                    },
-                    {
                         "name": "allow-5349",
                         "properties": {
                             "priority": 400,
