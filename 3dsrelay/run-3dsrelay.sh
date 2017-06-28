@@ -27,5 +27,5 @@ exec turnserver -v \
     --lt-cred-mech \
     --cert "etc/ssl/turn_server_cert.pem" \
     --pkey "etc/ssl/turn_server_pkey.pem" \
-    --psql-userdb "$1" \
+    --psql-userdb $1 \
     --realm $2
