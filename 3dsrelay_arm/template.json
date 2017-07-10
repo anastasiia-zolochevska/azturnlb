@@ -59,6 +59,9 @@
         "turnImage": {
             "type": "String"
         },
+        "secretBasedAuthentication": {
+            "type": "Bool"
+        },
         "vaultName": {
             "defaultValue": "keyvault3dstreaming",
             "type": "String",
@@ -221,7 +224,7 @@
                     "fileUris": [
                         "https://raw.githubusercontent.com/anastasiia-zolochevska/azturnlb/master/3dsrelay_arm/startDocker.sh"
                     ],
-                    "commandToExecute": "[concat('bash startDocker.sh ', parameters('certThumbprint'),' ', parameters('turnImage'), ' ',parameters('postgreSqlConnectionString'),' ', parameters('defaultTurnRealm'))]"
+                    "commandToExecute": "[concat('bash startDocker.sh ', parameters('certThumbprint'),' ', parameters('turnImage'), ' ',parameters('postgreSqlConnectionString'),' ', parameters('defaultTurnRealm')), ' ', parameters('secretBasedAuthentication')]"
                 }
             },
             "dependsOn": [
