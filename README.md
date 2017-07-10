@@ -5,7 +5,8 @@ Very much a work in progress.
 
 
 Rough Steps:
-1. Create and push docker images for turnserver, turn server loadbalancer, and turnadmin
+1. Create and push docker images for turnserver (you can use zolochevska/3dsrelay), turn server loadbalancer, and turnadmin (you can use zolochevska/3dsrelayadmin)
+
 1. Deploy (arm template) Azure PostgreSQL instance
     1. Create resource group for deployment `az group create --location 'Central US' --name 'azturntst-psql-rg'`
     1. Deploy: `az group deployment create --name 'psql' --template-file ./psql/template.json --parameters '@./psql/parameters.json' --parameters "{\"administratorLogin\": {\"value\": \"matthew\"}, \"administratorLoginPassword\":{\"value\": \"GoodPasswordMaybe?\"}, \"serverName\": {\"value\": \"azturntstpsqlsrv\"}}" --resource-group "azturntst-psql-rg"`
