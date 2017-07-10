@@ -35,7 +35,10 @@ Rough Steps:
           ```sh
           PSQL_COTURN_CS=``./dbsetup/get_psql_connectionstring.sh azturntstpsqlsrv coturn "AnotherGoodPassword?" coturndb`  
           ```
-    1. Add user: `./dbsetup/add_turnuser.sh $PSQL_COTURN_CS user1 AGreatPassword azturntst.org`
+    1. Turnserver can be authenticated either by 1) username/password or 2) temp passwords that are generated based on the shared secret. If you shoose the first path, add user: 
+        `./dbsetup/add_turnuser.sh $PSQL_COTURN_CS user1 AGreatPassword azturntst.org` 
+        If you shoose the second path, add shared secret:
+        `./dbsetup/add_turnsecret.sh $PSQL_COTURN_CS AGreatSecret azturntst.org`
 
 1. Deploy (arm template) N instances of TURN relay server (requires PSQL connection string and default realm)
     1. Create Resource group: `az group create --name "azturntst-rly-rg" --location "Central US"`
