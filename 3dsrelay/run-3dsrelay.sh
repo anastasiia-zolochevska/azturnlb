@@ -3,8 +3,8 @@
 # Error if non-true result
 set -e
 
-if [[ -z "$1" || -z "$2" ]]; then
-    echo "Usage: 3dsrelay <postgres_connection_string> <default_realm>"
+if [[ -z "$1" || -z "$2" || -z "$3" ]]; then
+    echo "Usage: 3dsrelay <postgres_connection_string> <default_realm> <auth_method>"
     exit 1
 fi
 
@@ -17,15 +17,22 @@ externalIp="$(dig +short myip.opendns.com @resolver1.opendns.com)"
 echo External ip address: $externalIp
 echo Internal ip address: $internalIp
 
-echo Starting turnserver
+if [ $3 == 'shared_secret' ]
+then
+    auth_method="--use-auth-secret"
+else
+    auth_method="--lt-cred-mech"
+fi
+
+echo Starting turnserver with auth methos $auth_method 
+
 exec turnserver -v \
     -n \
     -L "$internalIp" \
     -E "$internalIp" \
     -X "$externalIp" \
-    -p 3478 \
-    --lt-cred-mech \
+    $auth_method \
     --cert "etc/ssl/turn_server_cert.pem" \
     --pkey "etc/ssl/turn_server_pkey.pem" \
-    --psql-userdb $1 \
+    --psql-userdb "$1" \
     --realm $2
