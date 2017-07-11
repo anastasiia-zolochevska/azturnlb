@@ -6,11 +6,13 @@ sudo openssl x509 -in /var/lib/waagent/$1.crt -out /etc/ssl/certs/turn/turn_serv
 
 sudo cp /var/lib/waagent/$1.prv  /etc/ssl/certs/turn/turn_server_pkey.pem
 
-if [ "$5" = 'true' || "$5" = '1' || "$5" = true || "$5" = 1 ] ; then
+if [ "$1" = 'true' || "$1" = '1' || "$1" = true || "$1" = 1  || "$1" = "True" ] ; then
     auth_method="shared_secret"
 else
      auth_method="long_term_creds"
 fi
+
+echo $auth_method
 
 echo Starting docker with params $2 "'$3'" $4 $auth_method
 
