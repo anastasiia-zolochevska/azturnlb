@@ -19,9 +19,9 @@ echo Internal ip address: $internalIp
 
 if [ $3 == 'shared_secret' ]
 then
-    auth_method="--use-auth-secret"
+    useAuthSecret="--use-auth-secret"
 else
-    auth_method="--lt-cred-mech"
+    useAuthSecret=""
 fi
 
 echo Starting turnserver with auth methos $auth_method 
@@ -31,6 +31,7 @@ exec turnserver -v \
     -L "$internalIp" \
     -E "$internalIp" \
     -X "$externalIp" \
+    --lt-cred-mech \
     $auth_method \
     --cert "etc/ssl/turn_server_cert.pem" \
     --pkey "etc/ssl/turn_server_pkey.pem" \
