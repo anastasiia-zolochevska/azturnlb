@@ -1,33 +1,69 @@
 {
-    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
-    "contentVersion": "1.0.0.0",
-    "parameters": {
-        "location": {
-            "value": "centralus"
-        },
-        "instanceCount": {
-            "value": 3
-        },
-        "virtualMachineNamePrefix": {
-            "value": "azturntst"
-        },
-        "virtualMachineSize": {
-            "value": "Standard_A2"
-        },
-        "adminPublicKey": {
-            "value": null
-        },
-        "diagnosticsStorageAccountName": {
-            "value": null
-        },
-        "postgreSqlConnectionString": {
-            "value": "host=something.postgres.database.azure.com dbname=coturndb user=coturn@something password=ADecentPassword? connect_timeout=30 sslmode=require port=543"
-        },
-        "defaultTurnRealm": {
-            "value": "azturntst.org"
-        },
-        "turnImage": {
-            "value": null
-        }
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "location": {
+      "value": "centralus"
+    },
+    "instanceCount": {
+      "value": 1
+    },
+    "virtualMachineNamePrefix": {
+      "value": "3dstreaming-turnserver-auth"
+    },
+    "virtualMachineSize": {
+      "value": "Standard_A2"
+    },
+    "adminUsername": {
+      "value": "turnroot"
+    },
+    "adminPublicKey": {
+      "value": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCguqU/xqEBEQYhWqguJiQD96as1zYLjGq9LQok1VDHAoAKf2cxVaapcrH0omys6Tb0HMkWbmFvuTTjfYzfPGbXvYtgeJS4Jf8FvTWhBRMOnzmy4vmmGJFZmdO+FpSLlhHSstHdx3gzCisSkryDZ6okfm/YwsTN9B6LJFNHaqhIvtbG4Eyt1TACLrk2AC5YKY9MjPOJJHO3U6ftSmkhL/CeYjw7I6q7SQkZOjzphd5k8jddaNeLAoaY3rveuKuiBNHlxfb6NjELTDG/h4dzOCypikXoDKlTWZy06jpNIm27pmRox54hj9rvwvaivtcn2qoWyJzdQc+OOAjerXWJUhr7 anastasiiazolochevska@anzoloch.local"
+    },
+    "availabilitySetPlatformFaultDomainCount": {
+      "value": "3"
+    },
+    "availabilitySetPlatformUpdateDomainCount": {
+      "value": "5"
+    },
+    "diagnosticsStorageUrl": {
+      "value": "https://3dstreamingdiagnostics.blob.core.windows.net/"
+    },
+    "addressPrefix": {
+      "value": "10.7.0.0/16"
+    },
+    "subnetName": {
+      "value": "default"
+    },
+    "subnetPrefix": {
+      "value": "10.7.1.0/24"
+    },
+    "publicIpAddressType": {
+      "value": "Static"
+    },
+    "postgreSqlConnectionString": {
+      "value": "host=something.postgres.database.azure.com dbname=coturndb user=coturn@something password=ADecentPassword? connect_timeout=30 sslmode=require port=5432"
+    },
+    "defaultTurnRealm": {
+      "value": "azturntst.org"
+    },
+    "turnImage": {
+      "value": "zolochevska/3dsrelay"
+    },
+    "secretBasedAuthentication": {
+      "value": true
+    },
+    "vaultName": {
+      "value": "keyvault3dstreaming"
+    },
+    "vaultResourceGroup": {
+      "value": "keyvault3dstreaming"
+    },
+    "secretUrlWithVersion": {
+      "value": "https://keyvault3dstreaming.vault.azure.net/secrets/turnCert/2d973062709843b2ba820cc3cece86c8"
+    },
+    "certThumbprint": {
+      "value": "18E1F24AAF85A6804ACC89FAC5DB9DFEFD30C034"
     }
+  }
 }
