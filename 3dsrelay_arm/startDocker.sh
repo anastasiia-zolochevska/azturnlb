@@ -1,4 +1,5 @@
 echo Input params $1 $2 $3 $4 $5
+echo Auth $5
 
 sudo mkdir /etc/ssl/certs/turn
 
@@ -6,7 +7,7 @@ sudo openssl x509 -in /var/lib/waagent/$1.crt -out /etc/ssl/certs/turn/turn_serv
 
 sudo cp /var/lib/waagent/$1.prv  /etc/ssl/certs/turn/turn_server_pkey.pem
 
-if [ "$5" = 'true' || "$5" = '1' || "$5" = true || "$5" = 1  || "$5" = "True" ] ; then
+if [[ "$5" = "true" || "$5" = "1" || "$5" = true || "$5" = 1  || "$5" = "True" ]] ; then
     auth_method="shared_secret"
 else
      auth_method="long_term_creds"
