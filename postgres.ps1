@@ -7,6 +7,7 @@
     [string]$turn_username,
     [string]$turn_password,
     [string]$turn_secret,
+    [string]$subscription_id = "",
     [string]$turn_realm = "azturntst.org",
     [string]$turnadmin_docker_image = "zolochevska/3dsrelayadmin:latest"
 )
@@ -14,6 +15,12 @@
 $env:PGPASSWORD = $db_password
 
 az login
+
+if ($subscription_id.Length -gt 0)
+{
+    "Selecting subscription $subscription_id"
+    az account set --subscription $subscription_id
+}
 
 "Creating resource group in azure"
 az group create --location $location --name $resource_group_name
