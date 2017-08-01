@@ -24,7 +24,7 @@ else
     useAuthSecret=""
 fi
 
-echo Starting turnserver with auth methos $auth_method 
+echo Starting turnserver with auth methos $3 
 
 exec turnserver -v \
     -n \
@@ -32,7 +32,7 @@ exec turnserver -v \
     -E "$internalIp" \
     -X "$externalIp" \
     --lt-cred-mech \
-    $auth_method \
+    $useAuthSecret \
     --cert "etc/ssl/turn_server_cert.pem" \
     --pkey "etc/ssl/turn_server_pkey.pem" \
     --psql-userdb "$1" \
