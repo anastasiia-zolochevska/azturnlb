@@ -22,7 +22,7 @@ Example (it will create Postgres DB with database for coturn and set turn shared
 2. Put certificate pfx file to keyvault (documentation is not ready yet)
 3. Deploy (arm template) N instances of TURN relay server (requires PSQL connection string, link to keyvault with certificate and default realm)
 
-[![Deploy to Azure](http://azuredeploy.net/deploybutton.png)](https://portal.azure.com/#create/Microsoft.Template/uri/https://raw.githubusercontent.com/anastasiia-zolochevska/coturn-to-azure-deployment/master/3dsrelay_arm/template.json)
+[![Deploy to Azure](http://azuredeploy.net/deploybutton.png)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fanastasiia-zolochevska%2Fcoturn-to-azure-deployment%2Fmaster%2F3dsrelay_arm%2Ftemplate.json)
     
     
 Use this button to deploy to Azure and set parameters using Azure portal
@@ -92,7 +92,7 @@ Here are some parameters you'll need to specify:
 1. Deploy (arm template) N instances of TURN relay server (requires PSQL connection string, link to keyvault with certificate and default realm)
 
     Use this button to deploy to Azure and set parameters using Azure portal:
-    [![Deploy to Azure](http://azuredeploy.net/deploybutton.png)](https://portal.azure.com/#create/Microsoft.Template/uri/https://raw.githubusercontent.com/anastasiia-zolochevska/coturn-to-azure-deployment/master/3dsrelay_arm/template.json)
+    [![Deploy to Azure](http://azuredeploy.net/deploybutton.png)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fanastasiia-zolochevska%2Fcoturn-to-azure-deployment%2Fmaster%2F3dsrelay_arm%2Ftemplate.json)
     
 Here are some parameters you'll need to specify:
  
