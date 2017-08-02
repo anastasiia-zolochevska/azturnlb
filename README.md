@@ -19,11 +19,13 @@ Example (it will create Postgres DB with database for coturn and set turn shared
     .\postgres.ps1 -resource_group_name "resourceGroupName" -location "westus" -psql_server_name "psqlServername" -db_username "dbuser" -db_password "dbPassword" -secret "sharedseret"
 ```
 
-1. Put certificate pfx file to keyvault (documentation is not ready yet)
-1. Deploy (arm template) N instances of TURN relay server (requires PSQL connection string, link to keyvault with certificate and default realm)
+2. Put certificate pfx file to keyvault (documentation is not ready yet)
+3. Deploy (arm template) N instances of TURN relay server (requires PSQL connection string, link to keyvault with certificate and default realm)
 
-    Use this button to deploy to Azure and set parameters using Azure portal:
-    [![Deploy to Azure](http://azuredeploy.net/deploybutton.png)](https://portal.azure.com/#create/Microsoft.Template/uri/https://raw.githubusercontent.com/anastasiia-zolochevska/coturn-to-azure-deployment/master/3dsrelay_arm/template.json)
+[![Deploy to Azure](http://azuredeploy.net/deploybutton.png)](https://portal.azure.com/#create/Microsoft.Template/uri/https://raw.githubusercontent.com/anastasiia-zolochevska/coturn-to-azure-deployment/master/3dsrelay_arm/template.json)
+    
+    
+Use this button to deploy to Azure and set parameters using Azure portal
     
 Here are some parameters you'll need to specify:
  
