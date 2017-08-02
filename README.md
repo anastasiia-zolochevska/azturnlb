@@ -8,7 +8,10 @@ Prerequisites:
 + [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli) installed (command `az` should work from powershell)
 
 ## Windows
-1. Run postgres.ps1 in powershell 
+1. Create Postgres DB to store credentials for TURN server and deploy it to Azure
+
+Run postgres.ps1 in powershell
+
 Example (it will create Postgres DB with database for coturn and set turn username/password):
 ```sh
     .\postgres.ps1 -resource_group_name "resourceGroupName" -location "westus" -psql_server_name "psqlServername" -db_username "dbuser" -db_password "dbPassword" -turn_username "user" -turn_password "turnPassword"
