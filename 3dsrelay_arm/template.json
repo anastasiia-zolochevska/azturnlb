@@ -4,7 +4,7 @@
     "parameters": {
         "instanceCount": {
             "type": "Int",
-            "defaultValue":"1"
+            "defaultValue":1
         },
         "virtualMachineNamePrefix": {
             "type": "String"
