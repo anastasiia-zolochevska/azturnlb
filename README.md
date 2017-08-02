@@ -6,7 +6,6 @@ Prerequisites:
 + [Postgres](https://www.postgresql.org/download/) installed on the local machine (command `psql --version` should work from powershell) 
 + [Docker](https://www.docker.com/) installed on the local machine (command `docker ps` should work from powershell) 
 + [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli) installed (command `az` should work from powershell)
-Steps for deployment:
 
 ## Windows
 1. Run postgres.ps1 in powershell 
@@ -21,17 +20,22 @@ Example (it will create Postgres DB with database for coturn and set turn shared
 ```
 
 1. Put certificate pfx file to keyvault (documentation is not ready yet)
-1. Deploy (arm template) N instances of TURN relay server (requires PSQL connection string and default realm)
-    1. Create Resource group: `az group create --name "azturntst-rly-rg" --location "Central US"`
-    1. Edit parameters in 3dsrelay_arm\parameters.json as desired, namely set the following:
-        1. `instanceCount` - The number of turn servers that will be setup
-        1. `virtualMachineNamePrefix` - The prefix used for various resources created (vm names, vnet, nsg, etc..)
-        1. `adminPublicKey` - The ssh public key that will be used to login to the machines if needed (Default user is `turnroot`)
-        1. `diagnosticsStorageAccountName` - Storage account that turn VMS will log diagnostics to
-        1. `postgreSqlConnectionString` - Should be the same as the PSQL_COTURN_CS value above
-        1. `defaultTurnRealm` - Ideally the same as the one configured for the users you added in the above step (e.g. azturntst.org)
-        1. `turnImage` - The container image you created that runs the relay.  ([zolochevska/3dsrelay](https://hub.docker.com/r/zolochevska/3dsrelay/) or your image created from 3dsrelay/)
-    1. Deploy the template: `az group deployment create --resource-group "azturntst-rly-rg" --template-file "3dsrelay_arm\template.json" --parameters "@3dsrelay_arm\parameters.json" --name "azturntstrly"`
+1. Deploy (arm template) N instances of TURN relay server (requires PSQL connection string, link to keyvault with certificate and default realm)
+
+    Use this button to deploy to Azure and set parameters using Azure portal:
+    [![Deploy to Azure](http://azuredeploy.net/deploybutton.png)](https://portal.azure.com/#create/Microsoft.Template/uri/https://raw.githubusercontent.com/anastasiia-zolochevska/coturn-to-azure-deployment/master/3dsrelay_arm/template.json)
+    
+Here are some parameters you'll need to specify:
+ 
+        instanceCount - The number of turn servers that will be setup
+        virtualMachineNamePrefix - The prefix used for various resources created (vm names, vnet, nsg, etc..)
+        adminPublicKey - The ssh public key that will be used to login to the machines if needed (Default user is `turnroot`)
+        diagnosticsStorageAccountName - Storage account that turn VMS will log diagnostics to
+        postgreSqlConnectionString - Should be the same as the PSQL_COTURN_CS value above
+        defaultTurnRealm - Ideally the same as the one configured for the users you added in the above step (e.g. azturntst.org)
+        turnImage - The container image you created that runs the relay.  ([zolochevska/3dsrelay](https://hub.docker.com/r/zolochevska/3dsrelay/) or your image created from 3dsrelay/)
+    
+    
 
 1. Deploy (arm template) TURN servers for load balancing (requires the external IP for each of the TURN server instances created in the previous step)
     1. Get the ip addresses from the previous step: `az network public-ip list -g azturntst-rly-rg`
@@ -83,16 +87,22 @@ Example (it will create Postgres DB with database for coturn and set turn shared
         If you shoose the second path, add shared secret:
         `./dbsetup/add_turnsecret.sh $PSQL_COTURN_CS AGreatSecret azturntst.org`
 
-1. Deploy (arm template) N instances of TURN relay server (requires PSQL connection string and default realm)
-    1. Create Resource group: `az group create --name "azturntst-rly-rg" --location "Central US"`
-    1. Edit parameters in 3dsrelay_arm\parameters.json as desired, namely set the following:
-        1. `instanceCount` - The number of turn servers that will be setup
-        1. `virtualMachineNamePrefix` - The prefix used for various resources created (vm names, vnet, nsg, etc..)
-        1. `adminPublicKey` - The ssh public key that will be used to login to the machines if needed (Default user is `turnroot`)
-        1. `diagnosticsStorageAccountName` - Storage account that turn VMS will log diagnostics to
-        1. `postgreSqlConnectionString` - Should be the same as the PSQL_COTURN_CS value above
-        1. `defaultTurnRealm` - Ideally the same as the one configured for the users you added in the above step (e.g. azturntst.org)
-        1. `turnImage` - The container image you created that runs the relay.  ([zolochevska/3dsrelay](https://hub.docker.com/r/zolochevska/3dsrelay/) or your image created from 3dsrelay/)
+1. Deploy (arm template) N instances of TURN relay server (requires PSQL connection string, link to keyvault with certificate and default realm)
+
+    Use this button to deploy to Azure and set parameters using Azure portal:
+    [![Deploy to Azure](http://azuredeploy.net/deploybutton.png)](https://portal.azure.com/#create/Microsoft.Template/uri/https://raw.githubusercontent.com/anastasiia-zolochevska/coturn-to-azure-deployment/master/3dsrelay_arm/template.json)
+    
+Here are some parameters you'll need to specify:
+ 
+        instanceCount - The number of turn servers that will be setup
+        virtualMachineNamePrefix - The prefix used for various resources created (vm names, vnet, nsg, etc..)
+        adminPublicKey - The ssh public key that will be used to login to the machines if needed (Default user is `turnroot`)
+        diagnosticsStorageAccountName - Storage account that turn VMS will log diagnostics to
+        postgreSqlConnectionString - Should be the same as the PSQL_COTURN_CS value above
+        defaultTurnRealm - Ideally the same as the one configured for the users you added in the above step (e.g. azturntst.org)
+        turnImage - The container image you created that runs the relay.  ([zolochevska/3dsrelay](https://hub.docker.com/r/zolochevska/3dsrelay/) or your image created from 3dsrelay/)
+    
+    
     1. Deploy the template: `az group deployment create --resource-group "azturntst-rly-rg" --template-file "3dsrelay_arm\template.json" --parameters "@3dsrelay_arm\parameters.json" --name "azturntstrly"`
 1. Deploy (arm template) TURN servers for load balancing (requires the external IP for each of the TURN server instances created in the previous step)
     1. Get the ip addresses from the previous step: `az network public-ip list -g azturntst-rly-rg`
