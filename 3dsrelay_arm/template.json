@@ -3,7 +3,8 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "instanceCount": {
-            "type": "Int"
+            "type": "Int",
+            "defaultValue":"1"
         },
         "virtualMachineNamePrefix": {
             "type": "String"
@@ -51,10 +52,12 @@
             "type": "SecureString"
         },
         "defaultTurnRealm": {
-            "type": "String"
+            "type": "String",
+            "defaultValue": "azturnst.org"
         },
         "turnImage": {
-            "type": "String"
+            "type": "String",
+            "defaultValue":"zolochevska/3dsrelay"
         },
         "secretBasedAuthentication": {
             "type": "Bool"
