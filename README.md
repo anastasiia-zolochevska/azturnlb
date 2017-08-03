@@ -4,8 +4,7 @@ Scripts and Config for deploying load balanced Coturn servers in Azure
 Prerequisites:
 
 + [Postgres](https://www.postgresql.org/download/) installed on the local machine (command `psql --version` should work from powershell) 
-+ [Docker](https://www.docker.com/) installed on the local machine (command `docker ps` should work from powershell) 
-+ [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli) installed (command `az` should work from powershell)
++ [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli) installed and the latest (component container was added in July 2017) (command `az` should work from powershell)
 
 ## Windows
 1. Create Postgres DB to store credentials for TURN server and deploy it to Azure
