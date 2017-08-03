@@ -23,13 +23,13 @@ Example (it will create Postgres DB with database for coturn and set turn shared
 
 2. Put certificate pfx file to keyvault 
 
-1. Request a certificate or create self-signed one. Convert certificate to PXF format using openssl.
-1. Run keyvault/keyvault.ps1 in powershell.
+    1. Request a certificate or create self-signed one. Convert certificate to PXF format using openssl.
+    1. Run keyvault/keyvault.ps1 in powershell.
 
-Example (it will create Postgres DB with database for coturn and set turn username/password):
+Example:
 ```sh
      .\keyvault\keyvault.ps1 -resource_group_name "resource-group-for-kv" -keyvault_name "keyvault-name" -location "westus" -password_for_cert "passwordforCert" -secret_name "turncertificate" -path_to_certificate .\turnserver3dstreaming.centralus.cloudapp.azure.com.pfx
-``
+```
 
 3. Deploy (arm template) N instances of TURN relay server (requires PSQL connection string, link to keyvault with certificate and default realm)
 
