@@ -66,15 +66,26 @@ Foreach ($table in $tables) {
 
 $psqlConnectionString = "host=$psql_server_name.postgres.database.azure.com dbname=coturndb user=coturn@$psql_server_name password=$db_password connect_timeout=30 sslmode=require port=5432"
 
+If ($location -Eq 'westus' -Or $location -Eq 'eastus' -Or $location -Eq 'westeurope') {
+    $resource_group_name_for_turnadmin=$resource_group_name   
+}
+Else{
+    $resource_group_name_for_turnadmin = $resource_group_name + "-turnadmin"
+    "Creating resource group for turnadmin in azure"
+    az group create --location 'westus' --name $resource_group_name_for_turnadmin
+}
+
+
 If ($turn_username -And $turn_password) {
     "Running docker to set username/password for turn user"
-    docker run --rm  $turnadmin_docker_image -e "$psqlConnectionString" -a -u $turn_username -p $turn_password -r $turn_realm
+     az container create -g $resource_group_name_for_turnadmin --name turnadmin-container --image "zolochevska/3dsrelayadmin" --ip-address public --command-line "/bin/sh ./run-3dsrelayadmin.sh -e '$psqlConnectionString' -a -u $turn_username -p $turn_password -r $turn_realm"
 }
 
 If ($turn_secret) {
     "Running docker to set shared secret for turn"
-    docker run --rm  $turnadmin_docker_image -e "$psqlConnectionString" -s $secret -r $realm
+     az container create -g $resource_group_name_for_turnadmin --name turnadmin-container --image "zolochevska/3dsrelayadmin" --ip-address public --command-line "/bin/sh ./run-3dsrelayadmin.sh -e '$psqlConnectionString' -s $turn_secret -r $turn_realm"
 }
 
-"Done"
+"Done. Connection string: " 
+$psqlConnectionString
 
