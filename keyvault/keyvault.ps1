@@ -20,7 +20,7 @@ if ($subscription_id.Length -gt 0)
 az group create --location $location --name $resource_group_name
 
 "Creating keyvault"
-az keyvault create -n $keyvault_name -g $resource_group_name
+az keyvault create -n $keyvault_name -g $resource_group_name --enabled-for-template-deployment true --enabled-for-deployment true
 
 "Uploading certificate"
 $secretInfo = az keyvault certificate import --vault-name $keyvault_name --name $secret_name --file $path_to_certificate --password $password_for_cert | ConvertFrom-Json
