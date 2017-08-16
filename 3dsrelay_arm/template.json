@@ -3,8 +3,8 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "instanceCount": {
-            "type": "Int",
-            "defaultValue":1
+            "defaultValue": 1,
+            "type": "Int"
         },
         "virtualMachineNamePrefix": {
             "type": "String"
@@ -28,10 +28,6 @@
             "defaultValue": "5",
             "type": "String"
         },
-        "diagnosticsStorageUrl": {
-            "defaultValue": "https://3dstreamingdiagnostics.blob.core.windows.net/",
-            "type": "String"
-        },
         "addressPrefix": {
             "defaultValue": "10.7.0.0/16",
             "type": "String"
@@ -52,12 +48,12 @@
             "type": "SecureString"
         },
         "defaultTurnRealm": {
-            "type": "String",
-            "defaultValue": "azturnst.org"
+            "defaultValue": "azturnst.org",
+            "type": "String"
         },
         "turnImage": {
-            "type": "String",
-            "defaultValue":"zolochevska/3dsrelay"
+            "defaultValue": "zolochevska/3dsrelay",
+            "type": "String"
         },
         "secretBasedAuthentication": {
             "type": "Bool"
@@ -167,7 +163,7 @@
                 "diagnosticsProfile": {
                     "bootDiagnostics": {
                         "enabled": true,
-                        "storageUri": "[parameters('diagnosticsStorageUrl')]"
+                        "storageUri": "[concat('https://', parameters('virtualMachineNamePrefix'),'diagnostics.blob.core.windows.net/')]"
                     }
                 },
                 "availabilitySet": {
@@ -176,6 +172,7 @@
             },
             "dependsOn": [
                 "networkinterfacecopy",
+                "[concat(parameters('virtualMachineNamePrefix'),'diagnostics')]",
                 "[concat('Microsoft.Compute/availabilitySets/', variables('availabilitySetName'))]"
             ]
         },
@@ -309,6 +306,20 @@
             "properties": {
                 "publicIpAllocationMethod": "[parameters('publicIpAddressType')]"
             }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts",
+            "sku": {
+                "name": "Standard_LRS",
+                "tier": "Standard"
+            },
+            "kind": "Storage",
+            "name": "[concat(parameters('virtualMachineNamePrefix'),'diagnostics')]",
+            "apiVersion": "2016-01-01",
+            "location": "[resourceGroup().location]",
+            "tags": {},
+            "properties": {},
+            "dependsOn": []
         },
         {
             "type": "Microsoft.Network/networkSecurityGroups",
