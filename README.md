@@ -21,7 +21,7 @@ Example (it will create Postgres DB with database for coturn and set turn shared
     .\postgres.ps1 -resource_group_name "resourceGroupName" -location "westus" -psql_server_name "psqlServername" -db_username "dbuser" -db_password "dbPassword" -secret "sharedseret"
 ```
 
-2. Put certificate pfx file to keyvault 
+2. Put certificate pfx file to keyvault (keyvault should be in the same region as TURN server VM) 
 
     1. Request a certificate or create self-signed one. Convert certificate to PXF format using openssl.
     1. Run keyvault/keyvault.ps1 in powershell.
