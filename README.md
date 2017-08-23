@@ -47,10 +47,8 @@ Here are some parameters you'll need to specify:
         postgreSqlConnectionString - Should be the same as the PSQL_COTURN_CS value above
         defaultTurnRealm - Ideally the same as the one configured for the users you added in the above step (e.g. azturntst.org)
         turnImage - The container image you created that runs the relay.  ([zolochevska/3dsrelay](https://hub.docker.com/r/zolochevska/3dsrelay/) or your image created from 3dsrelay/)
-    
-    
 
-1. Deploy (arm template) TURN servers for load balancing (requires the external IP for each of the TURN server instances created in the previous step)
+4. Deploy (arm template) TURN servers for load balancing (requires the external IP for each of the TURN server instances created in the previous step)
     1. Get the ip addresses from the previous step: `az network public-ip list -g azturntst-rly-rg`
     1. Create resource group for deployment: `az group create --name azturntst-rlylb-rg --location "Central US"`
     1. Update parameters as desired, namely set the following:
@@ -130,6 +128,3 @@ Here are some parameters you'll need to specify:
     1. Get the public ip for it to use for client/server config: `az network public-ip list -g azturntst-rlylb-rg`
 
 
-
-
-Obviously still lots of work to automate this E2E and at some point there should be another amangement interface instead of a bunch of scripts talking directly to PSQL.
